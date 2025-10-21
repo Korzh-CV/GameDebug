@@ -40,10 +40,13 @@ Point NextPoint;
 Point NextNextPoint;
 Point NextNextNextPoint;
 Point OldPoint;
+Point CollisPoint[4];
 float deltaTime = 0.0f;
 LARGE_INTEGER frequency;
 float time2Collision = 1.0f;
 float surplus = 0.0f;
+int k;
+bool debug;
 
 void CheckPlatform();
 void CheckBorders();
@@ -97,6 +100,9 @@ void InitGame() {
     NextPoint.y = 0;
     NextPoint.brickID = 40;
 }
+
+
+
 
 Point PointsCompare(std::vector<Point> points) {
 
@@ -365,28 +371,36 @@ void CheckBricks(bool repeat) {
 
         if (time2Collision <= 0) {
 
+            
+            //if (OldPoint.x != NextPoint.x && OldPoint.y != NextPoint.y) {
 
-            if (OldPoint.x != NextPoint.x && OldPoint.y != NextPoint.y) {
+            brick[NextPoint.brickID].status = FALSE;
 
-                brick[NextPoint.brickID].status = FALSE;
-
-            }
+            //}
 
             if (!repeat) {
                 surplus = abs(time2Collision);
+                k = 1;
+            }
+            else {
+                if(k<4){
+                CollisPoint[k].x = NextPoint.x;
+                CollisPoint[k].y = NextPoint.y;
+                k=k+1;
+                }
             }
 
             CollisionEffect();
 
             if (NextPoint.distance > surplus) {
                 StartGame = false;
-                ball.x = OldPoint.x + ball.Vx * surplus;
-                ball.y = OldPoint.y + ball.Vy * surplus;
-
+                ball.x = OldPoint.x + ball.Vx * surplus; //!!!!!!!!!!!!
+                ball.y = OldPoint.y + ball.Vy * surplus; 
             }
             else 
             {
                 StartGame = false;
+
                  ball.x = NextPoint.x;
                  ball.y = NextPoint.y;
                  surplus = surplus - NextPoint.distance;
@@ -588,11 +602,24 @@ void Render() {
     int time = (int)(time2Collision * 100);
     wsprintf(text, L"Time: %d", time);
     TextOut(window.bufferDC, 10, 50, text, lstrlen(text));
+  /*  for (int y = 0; y < 4; y++) {
+        wsprintf(text, L"Coll: %d", y);
+        TextOut(window.bufferDC, CollisPoint[y].x, CollisPoint[y].y, text, lstrlen(text));
 
+    }*/
 
+    wsprintf(text, L"Coll: %d", k);
+    TextOut(window.bufferDC, 0, 0, text, lstrlen(text));
 
 
     BitBlt(window.DC, 0, 0, window.width, window.height, window.bufferDC, 0, 0, SRCCOPY);
+}
+
+void DebugMode() {
+    
+
+
+
 }
 
 void Input() {
@@ -614,6 +641,11 @@ void Input() {
     if (GetAsyncKeyState('D')) {
         player.x += player.Vx * deltaTime;
     }
+
+    if (GetAsyncKeyState('Q')) {
+        DebugMode();
+    }
+
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -702,12 +734,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         QueryPerformanceCounter(&currentTime);
         deltaTime = static_cast<float>(currentTime.QuadPart - lastTime.QuadPart) / frequency.QuadPart;
         lastTime = currentTime;
-
+        float deltaTime1 = 0.05f;
         
         Render();
         Input();
         if (StartGame) {
-            Update(deltaTime);
+            Update(deltaTime1);
         }
         PlrCheckBorders();
         Sleep(10);
