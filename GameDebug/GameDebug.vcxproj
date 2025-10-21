@@ -135,6 +135,10 @@
     <ResourceCompile Include="GameDebug.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\x64\Debug\back.bmp" />
+    <Image Include="..\x64\Debug\ball.bmp" />
+    <Image Include="..\x64\Debug\brick.bmp" />
+    <Image Include="..\x64\Debug\player.bmp" />
     <Image Include="GameDebug.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
